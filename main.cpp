@@ -12,6 +12,9 @@ using namespace sf;
 
 int score = 0;
 int level = 0;
+int speed_lv = 0;
+int heal_lv = 0;
+int angry = 0;
 
 
 const int H = 12;
@@ -132,9 +135,9 @@ int main()
     Object walls;
     create_map(&walls);
 
-    vector<Vector2f> cors = {{200,200}};
-    vector<string> tex = {"sprites/down.png"};
-    vector<int> open_lvl = {0};
+    vector<Vector2f> cors = {{200,200},{300,200}};
+    vector<string> tex = {"sprites/down.png", "sprites/down.png"};
+    vector<int> open_lvl = {0, 0};
 
     Sick seeck;
     seeck.add_Seeck(cors, tex, open_lvl);
@@ -157,11 +160,16 @@ int main()
 
     UI::Button bum = UI::Button(Vector2f(20,20), "sprites/healing.png");
 
+    UI::Button button_up = UI::Button(Vector2f(20,20), "sprites/exit.png");
+
 
     float time_in_game = 0;
     float time_speed_up;
 
     int healing_status = 1;
+
+    string top_bar_path = "sprites/bar.png";
+    UI::Top_Bar top_bar = UI::Top_Bar(Vector2f(550,50), Vector2f(0,0), top_bar_path);
 
 
     while (window.isOpen())
@@ -183,37 +191,60 @@ int main()
         window.clear(Color::Red);
 
         time_in_game += time/1000000;
+
+
         if (time_in_game > 1)
         {
+            int last_score = score;
             score = seeck.update(time_in_game, level, score);
+            if (score != last_score)
+            {
+                angry++;
+            }
             time_in_game = 0;
         }
+
         if (nearest_sick(seeck, player.player).status == status_for_seeck::helping)
             time_speed_up = 0;
         else
             time_speed_up = time/1000;
 
         player.update(window , time_speed_up ,speed_up*healing_status, &objects_with_collision);
+
         camera(window, player, cam_pos);
-        player.draw_stamina(window);
+
         all_objects.draw_objects(window, player.player.getPosition());
+
         walls.draw_objects(window , player.player.getPosition());
+
         seeck.draw_Seeck(window);
+
+        player.draw_stamina(window);
+
+        top_bar.draw(window, score, speed_lv, heal_lv, angry);
+
+        UI::Lamps::draw(window,seeck, level);
 
 
         if (distance_p_s(nearest_sick(seeck,player.player).sprite,player) < 100)
         {
-            bum.draw(window, 40+player.get_position().x, 40+player.get_position().y);
-            if (nearest_sick(seeck,player.player).status == status_for_seeck::helping)
+            if (nearest_sick(seeck,player.player).status == status_for_seeck::helping){
                 healing_status = 0;
+                bum.set_tex("sprites/healing.png");
+                bum.draw(window, 40+player.get_position().x, 40+player.get_position().y);
 
-            else
+            }
+
+            else if (nearest_sick(seeck,player.player).status == status_for_seeck::need_help)
+            {
                 healing_status = 1;
-        }
+                bum.set_tex("sprites/E.png");
+                bum.draw(window, 40+player.get_position().x, 40+player.get_position().y);
+            }
+            else{
+                healing_status =  1;
+            }
 
-        if (Keyboard::isKeyPressed(Keyboard::Space))
-        {
-            cout << score << endl;
         }
 
 

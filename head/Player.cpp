@@ -140,10 +140,7 @@ bool Player::collision_wall(int player_x, int player_y, Sprite &obj) {
     int wall_x = obj.getPosition().x;
     int wall_y = obj.getPosition().y;
 
-    if(player_x + 32 >= wall_x && player_x <= wall_x + obj.getLocalBounds().width && player_y + 62 >= wall_y && player_y <= wall_y + obj.getLocalBounds().height)
-        return true;
-    else
-        return false;
+    return player_x + 32 >= wall_x && player_x <= wall_x + obj.getLocalBounds().width && player_y + 62 >= wall_y && player_y <= wall_y + obj.getLocalBounds().height;
 }
 
 Vector2<float> Player::get_position() {
