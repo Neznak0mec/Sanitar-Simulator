@@ -76,11 +76,11 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
 
     for (auto obj : *objects)
     {
-            if (collision_wall(player_x_, player_y, obj))
+            if (collision_wall(player_x_, player_y, &obj))
             {
                 moveX = 0;
             }
-            if (collision_wall(player_x, player_y_,obj))
+            if (collision_wall(player_x, player_y_, &obj))
             {
                 moveY = 0;
             }
@@ -136,12 +136,6 @@ void Player::draw_stamina(RenderWindow &window) {
     window.draw(stamina_bar);
 }
 
-bool Player::collision_wall(int player_x, int player_y, Sprite &obj) {
-    int wall_x = obj.getPosition().x;
-    int wall_y = obj.getPosition().y;
-
-    return player_x + 32 >= wall_x && player_x <= wall_x + obj.getLocalBounds().width && player_y + 62 >= wall_y && player_y <= wall_y + obj.getLocalBounds().height;
-}
 
 Vector2<float> Player::get_position() {
     return player.getPosition();
@@ -152,4 +146,15 @@ Vector2<float> Player::get_center() {
     position.x = player.getPosition().x+player.getTexture()->getSize().x/2;
     position.y = player.getPosition().y+player.getTexture()->getSize().y/2;
     return position;
+}
+
+bool Player::collision_wall(int player_x, int player_y, Sprite* obj) {
+    int wall_x = obj->getPosition().x;
+    int wall_y = obj->getPosition().y;
+
+    float scale_x = obj->getScale().x;
+    float scale_y = obj->getScale().y;
+
+    return (player_x + 32 >= wall_x && player_x <= wall_x + obj->getLocalBounds().width*scale_x)
+    && (player_y + 62 >= wall_y && player_y <= wall_y + obj->getLocalBounds().height*scale_y);
 }

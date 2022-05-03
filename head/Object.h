@@ -13,7 +13,7 @@ class Object {
 public:
     std::vector<sf::Sprite> Objects;
     sf::Texture aba;
-    void create_object(std::string texture_path, sf::Vector2f pos, int height = 0, int width = 0);
+    void create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale);
     void draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos);
 
 private:

@@ -30,7 +30,7 @@ public:
 
     vector<sick_info> all_seeck;
 
-    void add_Seeck(vector<Vector2f> cords, vector<string> textures_path, vector<int> open_lvls);
+    void add_Seeck(Vector2f cords, string textures_path, int open_lvls);
 
     void draw_Seeck(RenderWindow &window);
 

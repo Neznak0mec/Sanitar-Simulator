@@ -14,16 +14,34 @@ using namespace sf;
 
 namespace UI{
 
-    class Button{
+
+
+    class rec_Button{
         public:
+        sf::RectangleShape rect;
+        string text_button;
+
+        rec_Button(Vector2<float> size, Color color, Vector2<float> pos, string text);
+
+        rec_Button();
+
+        void draw(RenderWindow &window);
+
+        bool is_clicked(float pos1, float pos2);
+
+    };
+
+    class Button{
+    public:
         sf::RectangleShape shape;
+        UI::rec_Button rect = rec_Button({0,0},Color::Black,{0,0},"");
 
         Button(Vector2<float> size, string tex_path);
         void draw(RenderWindow &window,float pos1, float pos2);
 
         void set_tex(string tex_path);
 
-        bool is_clicked(float pos1, float pos2);
+        bool is_clicked(Vector2<int> pos);
 
     private:
         Vector2<int> pos;
@@ -48,6 +66,8 @@ namespace UI{
 
         static void draw(RenderWindow &window, Sick &sick,int lvl);
     };
+
+    bool menu(RenderWindow &window,Vector2<int> mouse_pos);
 };
 
 #endif //DURKACPP_UI_H

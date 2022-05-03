@@ -4,10 +4,42 @@
 
 #include "UI.h"
 
-UI::Button::Button( Vector2<float> size, string tex_path) {
+UI::rec_Button::rec_Button(Vector2<float> size, Color color, Vector2<float> pos, string text) {
+    rect.setSize(size);
+    rect.setFillColor(color);
+    rect.setPosition(pos.x, pos.y);
+    text_button = text;
+}
+
+void UI::rec_Button::draw(RenderWindow &window) {
+    window.draw(rect);
+    sf::Text text;
+    text.setString(text_button);
+    Font font;
+    font.loadFromFile("fonts/Agit_Prop.ttf");
+    text.setFont(font);
+    text.setPosition(rect.getPosition().x+20, rect.getPosition().y+18);
+    window.draw(text);
+}
+
+bool UI::rec_Button::is_clicked(float pos1, float pos2) {
+    if (rect.getGlobalBounds().contains(pos1, pos2))
+    {
+        printf("на");
+        if (Mouse::isButtonPressed(Mouse::Left))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+UI::Button::Button(Vector2<float> size, string tex_path) {
     shape.setSize(size);
     tex.loadFromFile(tex_path);
     shape.setTexture(&tex);
+    rect = UI::rec_Button(size,Color::Black,shape.getPosition(),"");
 }
 
 void UI::Button::draw(RenderWindow &window,float pos1, float pos2) {
@@ -15,18 +47,15 @@ void UI::Button::draw(RenderWindow &window,float pos1, float pos2) {
     window.draw(shape);
 }
 
-bool UI::Button::is_clicked(float pos1, float pos2) {
-    if (shape.getLocalBounds().contains(pos1, pos2)) {
-        if (Mouse::isButtonPressed(Mouse::Left)) {
-            return true;
-        }
-    }
-    return false;
-}
 
 void UI::Button::set_tex(string tex_path) {
     tex.loadFromFile(tex_path);
     shape.setTexture(&tex);
+}
+
+bool UI::Button::is_clicked(Vector2<int> pos)
+{
+    return rect.is_clicked(pos.x,pos.y);
 }
 
 
@@ -116,3 +145,33 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
     }
 
 };
+
+bool UI::menu(RenderWindow &window,Vector2<int> mouse_pos){
+    Sprite background;
+    Texture texture;
+    texture.loadFromFile("sprites/menu_back_ground.png");
+    texture.setSmooth(true);
+    background.setTexture(texture);
+    background.setScale({1.8,1.5});
+    background.setPosition({0,0});
+
+    window.clear();
+
+    window.draw(background);
+
+    auto start = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(100,400),"Start");
+    start.draw(window);
+
+    auto FAQ = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(100,500),"FAQ");
+    FAQ.draw(window);
+
+    if (start.is_clicked(mouse_pos.x,mouse_pos.y))
+    {
+        return false;
+    }
+
+    window.display();
+
+    return true;
+}
+

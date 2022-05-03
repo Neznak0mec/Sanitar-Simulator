@@ -14,17 +14,16 @@ float distance(sf::Sprite &sprite1, sf::Vector2<float> pos)
 
 void Object::draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos) {
     {
-        for (int i = 0; i < Objects.size(); i++)
+        for (auto & Object : Objects)
         {
-            if (distance(Objects[i], pos) < (sqrt(pow(window.getSize().x, 2) + pow(window.getSize().y, 2)) / 2)+100)
-                window.draw(Objects[i]);
-
+            if (distance(Object, pos) < (sqrt(pow(window.getSize().x, 2) + pow(window.getSize().y, 2)) / 2)+100)
+                window.draw(Object);
         }
     }
 
 }
 
-void Object::create_object(std::string texture_path, sf::Vector2f pos, int height, int width) {
+void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale) {
     if(!aba.loadFromFile(texture_path))
     {
         printf("Error load texture");
@@ -33,8 +32,24 @@ void Object::create_object(std::string texture_path, sf::Vector2f pos, int heigh
     aba.setSmooth(true);
     aba.setRepeated(false);
     object.setTexture(aba);
-    if (height != 0 && width != 0)
-        object.setScale({1,1});
+//    if size of object 1:1 set size of object 64x64 by using scaling
+    int width = object.getTexture()->getSize().x;
+    int height = object.getTexture()->getSize().y;
+    if (auto_scale) {
+        if (width == height) {
+            object.setScale(64.0f / width, 64.0f / height);
+        }
+            // if size of object 1:2 set size of object 64x128 by using scaling
+        else if (width <= 2 * height && width >= height) {
+            object.setScale(64.0f / width, 128.0f / height);
+        }
+            // if size of object 2:1 set size of object 128x64 by using scaling
+        else if (height <= 2 * width && height >= width) {
+            object.setScale(128.0f / width, 64.0f / height);
+        } else {
+            object.setScale(64.0f / width, 64.0f / height);
+        }
+    }
     object.setPosition(pos.x,pos.y);
 
     Objects.push_back(object);

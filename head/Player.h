@@ -19,7 +19,7 @@ public:
     void update(RenderWindow &window, float time_speed_up, float speed_up, vector<Sprite> *objects);
     void staminas(float time);
     void draw_stamina(RenderWindow &window);
-    static bool collision_wall(int player_x, int player_y, Sprite &obj);
+    static bool collision_wall(int player_x, int player_y, Sprite* obj);
     Vector2<float> get_position();
     Vector2<float> get_center();
 

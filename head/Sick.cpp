@@ -5,16 +5,15 @@
 #include "Sick.h"
 
 
-void Sick::add_Seeck(vector<Vector2f> cords, vector<string> textures_path, vector<int> open_lvls){
-    for (int i = 0; i < cords.size(); i++) {
+void Sick::add_Seeck(Vector2f cords, string textures_path, int open_lvls){
         Sprite sprite;
         Texture tex;
-        tex.loadFromFile(textures_path[i]);
+        tex.loadFromFile(textures_path);
         tex.setSmooth(true);
         sprite.setTexture(tex);
-        sprite.setPosition(cords[i]);
-        all_seeck.push_back(sick_info{rand()%70,open_lvls[i], status_for_seeck::no, 0, tex, sprite});
-    }
+        sprite.setPosition(cords);
+        all_seeck.push_back(sick_info{rand()%70,open_lvls, status_for_seeck::no, 0, tex, sprite});
+
 }
 
 
