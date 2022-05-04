@@ -19,7 +19,7 @@ int angry = 0;
 
 Vector2<float> center(Sprite sprite)
 {
-    return {sprite.getPosition().x+sprite.getLocalBounds().width,sprite.getPosition().y+sprite.getLocalBounds().height};
+    return {sprite.getPosition().x+sprite.getLocalBounds().width*sprite.getScale().x,sprite.getPosition().y+sprite.getLocalBounds().height*sprite.getScale().x};
 }
 
 
@@ -27,7 +27,7 @@ float distance(Sprite sprite1, Sprite sprite2)
 {
    Vector2<float> S1 = center(sprite1);
    Vector2<float> S2 = center(sprite2);
-    return sqrt(pow(S1.x-S2.x,2) + pow(S1.y - S2.y, 2));
+   return sqrt(pow(S1.x-S2.x,2) + pow(S1.y - S2.y, 2));
 }
 
 Sick::sick_info nearest_sick(Sick &seeck, Sprite &player)
@@ -52,26 +52,40 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
         for (int j = 0; j < map[i].length(); j++)
         {
             string elem(1, map[i][j]);
+
+
             if (fil[elem]["type"].is_null() || elem == " ")
             {
                 continue;
             }
+
+
             if (fil[elem]["type"].get<string>()=="wall")
             {
                 walls->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), fil[elem]["auto_scale"].get<bool>());
+
                 colis->push_back(walls->Objects[walls->Objects.size()-1]);
             }
+
+
             if (fil[elem]["type"].get<string>()=="obj")
             {
                 obj->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), fil[elem]["auto_scale"].get<bool>());
+
                 if (fil[elem]["collision"].get<bool>())
                     colis->push_back(obj->Objects[obj->Objects.size()-1]);
             }
+
+
             if (fil[elem]["type"].get<string>()=="sick")
             {
-                sick->add_Seeck(Vector2f(j*64, i*64),fil[elem]["tex_path"].get<string>(),fil[elem]["lvl"].get<int>());
+                Vector2<int> size = {fil[elem]["width"].get<int>(),fil[elem]["height"].get<int>()};
+
+                sick->add_Seeck(Vector2f(j*64, i*64),fil[elem]["tex_path"].get<string>(),fil[elem]["lvl"].get<int>(),size);
                 colis->push_back(sick->all_seeck[sick->all_seeck.size()-1].sprite);
             }
+
+
             if (fil[elem]["type"].get<string>()=="player")
             {
                 player->player.setPosition(Vector2f(j*64, i*64));
@@ -80,7 +94,8 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
     }
 }
 
-void camera(RenderWindow &window, Player &player)  {
+void camera(RenderWindow &window, Player &player)
+{
     View view;
     view.setSize(Vector2f(1400, 840));
     view.setCenter(player.player.getPosition());
@@ -147,7 +162,7 @@ int main()
     int healing_status = 1;
 
     string top_bar_path = "sprites/bar.png";
-    UI::Top_Bar top_bar = UI::Top_Bar(Vector2f(550,50), Vector2f(0,0), top_bar_path);
+    UI::Top_Bar top_bar = UI::Top_Bar(Vector2f(1100,100), Vector2f(0,0), top_bar_path);
 
     bool pause = false;
     Sprite pause_sprite;
@@ -170,6 +185,12 @@ int main()
         if (event.type == Event::Closed)
             window.close();
 
+        if (exitB.is_clicked(window))
+        {
+            window.close();
+        }
+
+
         if (menu_open) {
             menu_open = UI::menu(window, Mouse::getPosition(window));
             continue;
@@ -179,7 +200,7 @@ int main()
         time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
 
-        window.clear(Color::Red);
+        window.clear(Color::Green);
 
         time_in_game += time/1000000;
 
@@ -224,15 +245,6 @@ int main()
 
         exitB.draw(window,player.player.getPosition().x+640,player.player.getPosition().y-410);
 
-        if (exitB.shape.getGlobalBounds().contains(Mouse::getPosition().x,Mouse::getPosition().y))
-            printf("ага");
-
-        if (exitB.is_clicked(Mouse::getPosition(window)))
-        {
-            printf("иди нахуй чмо\n");
-            window.close();
-        }
-
 
         if (distance(player.player,nearest_sick(seeck,player.player).sprite) < 100)
         {
@@ -258,7 +270,7 @@ int main()
         if (Keyboard::isKeyPressed(Keyboard::E))
         {
             int mh = may_help(seeck,player);
-            if (mh!= -1)
+            if (mh != -1)
             {
                 seeck.all_seeck[mh].status = status_for_seeck::helping;
                 seeck.all_seeck[mh].time_have = 30;

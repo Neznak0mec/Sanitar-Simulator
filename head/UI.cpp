@@ -22,10 +22,13 @@ void UI::rec_Button::draw(RenderWindow &window) {
     window.draw(text);
 }
 
-bool UI::rec_Button::is_clicked(float pos1, float pos2) {
-    if (rect.getGlobalBounds().contains(pos1, pos2))
+bool UI::rec_Button::is_clicked(RenderWindow &window) {
+    Vector2<int> pos = Mouse::getPosition(window);
+    float but_x = rect.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x/2;
+    float but_y = rect.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y/2;
+
+    if (pos.x > but_x && pos.x < but_x + rect.getSize().x && pos.y > but_y && pos.y < but_y + rect.getSize().y)
     {
-        printf("на");
         if (Mouse::isButtonPressed(Mouse::Left))
         {
             return true;
@@ -39,7 +42,6 @@ UI::Button::Button(Vector2<float> size, string tex_path) {
     shape.setSize(size);
     tex.loadFromFile(tex_path);
     shape.setTexture(&tex);
-    rect = UI::rec_Button(size,Color::Black,shape.getPosition(),"");
 }
 
 void UI::Button::draw(RenderWindow &window,float pos1, float pos2) {
@@ -53,9 +55,20 @@ void UI::Button::set_tex(string tex_path) {
     shape.setTexture(&tex);
 }
 
-bool UI::Button::is_clicked(Vector2<int> pos)
+bool UI::Button::is_clicked(RenderWindow &window)
 {
-    return rect.is_clicked(pos.x,pos.y);
+    Vector2<int> pos = Mouse::getPosition(window);
+    float but_x = shape.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x/2;
+    float but_y = shape.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y/2;
+
+    if (pos.x > but_x && pos.x < but_x + shape.getSize().x && pos.y > but_y && pos.y < but_y + shape.getSize().y)
+    {
+        if (Mouse::isButtonPressed(Mouse::Left))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -66,18 +79,19 @@ UI::Top_Bar::Top_Bar(Vector2<float> size, Vector2<float> pos, string tex_path) {
     shape.setPosition(pos);
 }
 
-void UI::Top_Bar::draw(RenderWindow &window,int sc ,int sl, int hl, int ang) {
+void UI::Top_Bar::draw(RenderWindow &window,int sc ,int sl, int hl, int ang)
+{
     float x = window.getView().getCenter().x;
     float y = window.getView().getCenter().y;
-    shape.setPosition(x-275, y-200 );
-    // draw text
+    shape.setPosition(x-550, y-420 );
+
     Font font;
     font.loadFromFile("fonts/Agit_Prop.ttf");
     Text text;
     text.setFont(font);
     text.setString(to_string(sc));
-    text.setCharacterSize(25);
-    text.setPosition(x-120, y-196);
+    text.setCharacterSize(50);
+    text.setPosition(x-250, y-410);
     text.setFillColor(Color::Black);
 
 
@@ -85,24 +99,23 @@ void UI::Top_Bar::draw(RenderWindow &window,int sc ,int sl, int hl, int ang) {
     window.draw(text);
 
     text.setString(to_string(sl));
-    text.setPosition(x+25, y-196);
+    text.setPosition(x+40, y-410);
     window.draw(text);
 
     text.setString(to_string(hl));
-    text.setPosition(x+112, y-196);
+    text.setPosition(x+220, y-410);
     window.draw(text);
 
     text.setString(to_string(ang));
-    text.setPosition(x+199, y-196);
+    text.setPosition(x+400, y-410);
     window.draw(text);
 }
 
 
 void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
-    //get screen size
     float w = window.getView().getCenter().x;
     float y = window.getView().getCenter().y;
-    y = y + 170;
+    y = y + 380;
     double center = w;
 
     vector<Sick::sick_info> objects;
@@ -114,11 +127,11 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
     Font font;
     font.loadFromFile("fonts/Agit_Prop.ttf");
     text.setFont(font);
-    text.setCharacterSize(20);
+    text.setCharacterSize(30);
     text.setFillColor(Color::Black);
-    CircleShape circle(40);
+    CircleShape circle(60);
 
-    double startPosition = center - (objects.size() * 40 + (objects.size() - 1) * 5);
+    double startPosition = center - (objects.size() * 60 + (objects.size() - 1) * 5);
 
 
     for (int i = 0; i < objects.size(); ++i) {
@@ -136,9 +149,9 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
 
         text.setString(to_string(i+1));
 
-        circle.setPosition(startPosition + i * 90, y );
+        circle.setPosition(startPosition + i * 120, y );
 
-        text.setPosition(startPosition + i * 90+35, y );
+        text.setPosition(startPosition + i * 120+50, y );
 
         window.draw(circle);
         window.draw(text);
@@ -165,7 +178,7 @@ bool UI::menu(RenderWindow &window,Vector2<int> mouse_pos){
     auto FAQ = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(100,500),"FAQ");
     FAQ.draw(window);
 
-    if (start.is_clicked(mouse_pos.x,mouse_pos.y))
+    if (start.is_clicked(window))
     {
         return false;
     }

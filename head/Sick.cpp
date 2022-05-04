@@ -5,21 +5,27 @@
 #include "Sick.h"
 
 
-void Sick::add_Seeck(Vector2f cords, string textures_path, int open_lvls){
-        Sprite sprite;
+void Sick::add_Seeck(Vector2f cords, string textures_path, int open_lvls,Vector2<int> size){
+        int id;
+        if (all_seeck.empty())
+            id = 1;
+        else
+            id = all_seeck[all_seeck.size()-1].id+1;
         Texture tex;
         tex.loadFromFile(textures_path);
         tex.setSmooth(true);
-        sprite.setTexture(tex);
+        Sprite sprite;
         sprite.setPosition(cords);
-        all_seeck.push_back(sick_info{rand()%70,open_lvls, status_for_seeck::no, 0, tex, sprite});
-
+        sprite.setTexture(tex);
+        sprite.setScale(size.x/sprite.getLocalBounds().width,size.y/sprite.getLocalBounds().height);
+        all_seeck.push_back(sick_info{id ,open_lvls, status_for_seeck::no, 0 ,sprite, tex});
 }
 
 
 
 void Sick::draw_Seeck(RenderWindow &window){
     for (int i = 0; i < all_seeck.size(); i++) {
+        all_seeck[i].sprite.setTexture(all_seeck[i].tex);
         window.draw(all_seeck[i].sprite);
     }
 }

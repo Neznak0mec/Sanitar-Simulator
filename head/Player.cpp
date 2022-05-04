@@ -12,26 +12,26 @@ Player::Player(float x, float y, Texture texture) {
 }
 
 void Player::update(RenderWindow &window, float time_speed_up, float speed_up, vector<Sprite> *objects) {
-    if (Keyboard::isKeyPressed((Keyboard::W)) && Keyboard::isKeyPressed((Keyboard::S)))
+    if ((Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed((Keyboard::Up)) )&& (Keyboard::isKeyPressed((Keyboard::S)) || Keyboard::isKeyPressed((Keyboard::Down))))
         moveX = 0;
 
-    else if(Keyboard::isKeyPressed((Keyboard::W)))
+    else if(Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed((Keyboard::Up)))
         moveX = -0.1;
 
 
-    else if(Keyboard::isKeyPressed((Keyboard::S)))
+    else if(Keyboard::isKeyPressed((Keyboard::S)) || Keyboard::isKeyPressed((Keyboard::Down)))
         moveX = 0.1;
 
     else
         moveX = 0;
 
-    if (Keyboard::isKeyPressed((Keyboard::A)) && Keyboard::isKeyPressed((Keyboard::D)))
+    if ((Keyboard::isKeyPressed((Keyboard::A)) || Keyboard::isKeyPressed(Keyboard::Left)) && (Keyboard::isKeyPressed((Keyboard::D)) || Keyboard::isKeyPressed(Keyboard::Right)))
         moveY = 0;
 
-    else if(Keyboard::isKeyPressed((Keyboard::A)))
+    else if(Keyboard::isKeyPressed((Keyboard::A)) || Keyboard::isKeyPressed(Keyboard::Left))
         moveY = -0.1;
 
-    else if(Keyboard::isKeyPressed((Keyboard::D)))
+    else if(Keyboard::isKeyPressed((Keyboard::D)) || Keyboard::isKeyPressed(Keyboard::Right))
         moveY = 0.1;
 
     else
@@ -40,23 +40,26 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
 
     float speed= 0.065555;
 
-    if (Keyboard::isKeyPressed((Keyboard::W)) && Keyboard::isKeyPressed((Keyboard::D)))
+    if ((Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed(Keyboard::Up)) && (Keyboard::isKeyPressed((Keyboard::D)) || Keyboard::isKeyPressed(Keyboard::Right)))
     {
         moveX = -speed;
         moveY = speed;
     }
 
-    else if(Keyboard::isKeyPressed((Keyboard::W)) && Keyboard::isKeyPressed((Keyboard::A))){
+    else if((Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed(Keyboard::Up)) && (Keyboard::isKeyPressed((Keyboard::A))|| Keyboard::isKeyPressed(Keyboard::Left)))
+    {
         moveX = -speed;
         moveY = -speed;
     }
 
-    else if(Keyboard::isKeyPressed((Keyboard::S)) && Keyboard::isKeyPressed((Keyboard::D))){
+    else if((Keyboard::isKeyPressed((Keyboard::S)) || Keyboard::isKeyPressed(Keyboard::Down)) && (Keyboard::isKeyPressed((Keyboard::D))|| Keyboard::isKeyPressed(Keyboard::Right)))
+    {
         moveX = speed;
         moveY = speed;
     }
 
-    else if(Keyboard::isKeyPressed((Keyboard::S)) && Keyboard::isKeyPressed((Keyboard::A))){
+    else if((Keyboard::isKeyPressed((Keyboard::S)) || Keyboard::isKeyPressed(Keyboard::Down)) && (Keyboard::isKeyPressed((Keyboard::A)) || Keyboard::isKeyPressed(Keyboard::Left)))
+    {
         moveX = speed;
         moveY = -speed;
     }
@@ -84,7 +87,6 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
             {
                 moveY = 0;
             }
-
     }
 
     player.move(moveY*time_speed_up*speed_up*stamina_speed_up,moveX*time_speed_up*speed_up*stamina_speed_up);
@@ -95,7 +97,7 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
 void Player::staminas(float time) {
     if (stamina < 0)
         stamina = 0;
-    if (Keyboard::isKeyPressed((Keyboard::LShift)))
+    if (Keyboard::isKeyPressed((Keyboard::LShift)) || Keyboard::isKeyPressed(Keyboard::RShift))
     {
         wait_time_to_recovery_stamina = 0;
         if (stamina > 0)

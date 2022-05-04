@@ -23,25 +23,22 @@ namespace UI{
 
         rec_Button(Vector2<float> size, Color color, Vector2<float> pos, string text);
 
-        rec_Button();
-
         void draw(RenderWindow &window);
 
-        bool is_clicked(float pos1, float pos2);
+        bool is_clicked(RenderWindow &window);
 
     };
 
     class Button{
     public:
         sf::RectangleShape shape;
-        UI::rec_Button rect = rec_Button({0,0},Color::Black,{0,0},"");
 
         Button(Vector2<float> size, string tex_path);
         void draw(RenderWindow &window,float pos1, float pos2);
 
         void set_tex(string tex_path);
 
-        bool is_clicked(Vector2<int> pos);
+        bool is_clicked(RenderWindow &window);
 
     private:
         Vector2<int> pos;

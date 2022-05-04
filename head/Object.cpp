@@ -14,10 +14,12 @@ float distance(sf::Sprite &sprite1, sf::Vector2<float> pos)
 
 void Object::draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos) {
     {
-        for (auto & Object : Objects)
-        {
-            if (distance(Object, pos) < (sqrt(pow(window.getSize().x, 2) + pow(window.getSize().y, 2)) / 2)+100)
-                window.draw(Object);
+        for (int i = 0; i < Objects.size(); i++) {
+            if (distance(Objects[i], pos) < (sqrt(pow(window.getSize().x, 2) + pow(window.getSize().y, 2)) / 2)+100)
+            {
+                Objects[i].setTexture(Tex[i]);
+                window.draw(Objects[i]);
+            }
         }
     }
 
@@ -32,7 +34,7 @@ void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto
     aba.setSmooth(true);
     aba.setRepeated(false);
     object.setTexture(aba);
-//    if size of object 1:1 set size of object 64x64 by using scaling
+    Tex.push_back(aba);
     int width = object.getTexture()->getSize().x;
     int height = object.getTexture()->getSize().y;
     if (auto_scale) {
