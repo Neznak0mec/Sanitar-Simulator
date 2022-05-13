@@ -3,6 +3,20 @@
 //
 #include "Object.h"
 
+using namespace sf;
+
+Vector2<float> centerS(Sprite sprite)
+{
+    return {sprite.getPosition().x+sprite.getLocalBounds().width*sprite.getScale().x,sprite.getPosition().y+sprite.getLocalBounds().height*sprite.getScale().x};
+}
+
+float distancec(Sprite sprite1, Sprite sprite2)
+{
+    Vector2<float> S1 = centerS(sprite1);
+    Vector2<float> S2 = centerS(sprite2);
+    return sqrt(pow(S1.x-S2.x,2) + pow(S1.y - S2.y, 2));
+}
+
 float distance(sf::Sprite &sprite1, sf::Vector2<float> pos)
 {
     float x1 = sprite1.getPosition().x;
@@ -25,7 +39,7 @@ void Object::draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos) {
 
 }
 
-void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale) {
+void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale, sf::Vector2i size) {
     if(!aba.loadFromFile(texture_path))
     {
         printf("Error load texture");
@@ -41,18 +55,21 @@ void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto
         if (width == height) {
             object.setScale(64.0f / width, 64.0f / height);
         }
-            // if size of object 1:2 set size of object 64x128 by using scaling
         else if (width <= 2 * height && width >= height) {
             object.setScale(64.0f / width, 128.0f / height);
         }
-            // if size of object 2:1 set size of object 128x64 by using scaling
         else if (height <= 2 * width && height >= width) {
             object.setScale(128.0f / width, 64.0f / height);
         } else {
             object.setScale(64.0f / width, 64.0f / height);
         }
     }
+
+    if (!auto_scale && size.x != 0 && size.y != 0) {
+        object.setScale(size.x / width, size.y / height);
+    }
     object.setPosition(pos.x,pos.y);
 
     Objects.push_back(object);
 }
+

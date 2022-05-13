@@ -35,7 +35,7 @@ public:
 
     void draw_Seeck(RenderWindow &window);
 
-    int update(float time, int level, int score);
+    void update(float time, int level, int* score);
 
 };
 

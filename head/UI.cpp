@@ -98,7 +98,7 @@ void UI::Top_Bar::draw(RenderWindow &window,int sc ,int sl, int hl, int ang)
     window.draw(shape);
     window.draw(text);
 
-    text.setString(to_string(sl));
+    text.setString(to_string(sl-1));
     text.setPosition(x+40, y-410);
     window.draw(text);
 
@@ -120,7 +120,7 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
 
     vector<Sick::sick_info> objects;
     for (int i = 0; i < sick.all_seeck.size(); ++i)
-        if (sick.all_seeck[i].open_lvl == lvl)
+        if (sick.all_seeck[i].open_lvl <= lvl)
             objects.push_back(sick.all_seeck[i]);
 
     Text text;
@@ -159,23 +159,51 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
 
 };
 
-bool UI::menu(RenderWindow &window,Vector2<int> mouse_pos){
+void FAQ_menu(RenderWindow &window, bool* FAQ_open)
+{
+    Sprite sprite;
+    Texture tex;
+
+    tex.loadFromFile("sprites/FAQ.png");
+    tex.setSmooth(true);
+    sprite.setTexture(tex);
+
+    sprite.setPosition(200,200);
+
+    UI::Button close = UI::Button({65,64},"sprites/menu_close.png");
+
+    window.draw(sprite);
+    close.draw(window, window.getView().getCenter().x+400, window.getView().getCenter().y-400);
+
+    if (close.is_clicked(window))
+    {
+        *FAQ_open = false;
+    }
+
+
+}
+
+
+bool UI::menu(RenderWindow &window, bool* FAQ_open){
     Sprite background;
     Texture texture;
     texture.loadFromFile("sprites/menu_back_ground.png");
     texture.setSmooth(true);
     background.setTexture(texture);
-    background.setScale({1.8,1.5});
-    background.setPosition({0,0});
+
+    background.setPosition(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
+    background.setScale(window.getSize().x/background.getLocalBounds().width,window.getSize().y/background.getLocalBounds().height);
+
+    Vector2<float> pos0 = Vector2<float>(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
 
     window.clear();
 
     window.draw(background);
 
-    auto start = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(100,400),"Start");
+    auto start = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+400),"Start");
     start.draw(window);
 
-    auto FAQ = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(100,500),"FAQ");
+    auto FAQ = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+500),"FAQ");
     FAQ.draw(window);
 
     if (start.is_clicked(window))
@@ -183,8 +211,214 @@ bool UI::menu(RenderWindow &window,Vector2<int> mouse_pos){
         return false;
     }
 
+
+    if (FAQ.is_clicked(window)){
+        *FAQ_open = true;
+    }
+
+    if (*FAQ_open)
+        FAQ_menu(window, FAQ_open);
+
     window.display();
 
     return true;
+}
+
+void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl) {
+
+
+    Sprite background;
+    Texture texture;
+    texture.loadFromFile("sprites/Objects/clear_book.png");
+    texture.setSmooth(true);
+    background.setTexture(texture);
+    background.setScale(4,4);
+
+
+    Button speed_upgrade(Vector2<float>(300,150),"sprites/buttons/yskorin_ru.png");
+
+    Button heal_upgrade(Vector2<float>(300,150),"sprites/buttons/yzbogoin_ru.png");
+    Button lvl_upgrade(Vector2<float>(300,150),"sprites/buttons/lv_1_ru.png");
+    Button ang_downgrade(Vector2<float>(300,150),"sprites/buttons/angry_1_ru.png");
+
+    int speed_cost;
+    int heal_cost;
+    int lvl_cost;
+    int help_cost;
+
+    //button for upgrade speed
+    switch (*sl) {
+        case 1:
+            speed_upgrade.set_tex("sprites/buttons/yskorin_ru.png");
+            speed_cost = 100;
+            break;
+
+        case 2:
+            speed_upgrade.set_tex("sprites/buttons/yskorin+_ru.png");
+            speed_cost = 100;
+            break;
+
+        case 3:
+            speed_upgrade.set_tex("sprites/buttons/yskorin++_ru.png");
+            speed_cost = 100;
+            break;
+
+        case 4:
+            speed_upgrade.set_tex("sprites/buttons/yskorin-_ru.png");
+            speed_cost = INT32_MAX;
+            break;
+    }
+
+    switch (*hl) {
+        case 0:
+            heal_upgrade.set_tex("sprites/buttons/yzbogoin_ru.png");
+            heal_cost = 100;
+            break;
+
+        case 1:
+            heal_upgrade.set_tex("sprites/buttons/yzbogoin+_ru.png");
+            heal_cost = 100;
+            break;
+
+        case 2:
+            heal_upgrade.set_tex("sprites/buttons/yzbogoin++_ru.png");
+            heal_cost = 100;
+            break;
+
+        case 3:
+            heal_upgrade.set_tex("sprites/buttons/yzbogoin-_ru.png");
+            heal_cost = INT32_MAX;
+            break;
+
+    }
+
+    switch (*lvl) {
+        case 0:
+            lvl_upgrade.set_tex("sprites/buttons/lv_1_ru.png");
+            lvl_cost = 100;
+            break;
+
+        case 1:
+            lvl_upgrade.set_tex("sprites/buttons/lv_2_ru.png");
+            lvl_cost = 100;
+            break;
+
+        case 2:
+            lvl_upgrade.set_tex("sprites/buttons/lv_3_ru.png");
+            lvl_cost = INT32_MAX;
+            break;
+    }
+
+    switch (help) {
+        case 0:
+            ang_downgrade.set_tex("sprites/buttons/angry_1_ru.png");
+            help_cost = 100;
+            break;
+
+        case 1:
+            ang_downgrade.set_tex("sprites/buttons/angry_2_ru.png");
+            help_cost = 100;
+            break;
+
+        case 2:
+            ang_downgrade.set_tex("sprites/buttons/angry_3_ru.png");
+            help_cost = INT32_MAX;
+            break;
+
+    }
+
+    int start_x = window.getView().getCenter().x - window.getView().getSize().x/2;
+    int start_y = window.getView().getCenter().y - window.getView().getSize().y/2;
+
+    background.setPosition({static_cast<float>(start_x+220),static_cast<float>(start_y+100)});
+    window.draw(background);
+    speed_upgrade.draw(window,start_x+300,start_y+200);
+    heal_upgrade.draw(window,start_x+800,start_y+200);
+    lvl_upgrade.draw(window,start_x+300,start_y+425);
+    ang_downgrade.draw(window,start_x+800,start_y+425);
+
+
+    if (Mouse::isButtonPressed(Mouse::Left)){
+        if ( !is_clicked) {
+            if (speed_upgrade.is_clicked(window) && *sc >= speed_cost) {
+                *sc -= speed_cost;
+                *sl += 1;
+            }
+
+            if (heal_upgrade.is_clicked(window) && *sc >= heal_cost) {
+                *sc -= heal_cost;
+                *hl += 1;
+            }
+
+            if (lvl_upgrade.is_clicked(window) && *sc >= lvl_cost) {
+                *sc -= lvl_cost;
+                *lvl += 1;
+            }
+
+            if (ang_downgrade.is_clicked(window) && *sc >= help_cost && *ang>1) {
+                *sc -= help_cost;
+                help++;
+                *ang-=1;
+            }
+
+        }
+        is_clicked = true;
+    }
+    else
+        is_clicked = false;
+
+
+};
+
+
+void UI::game_over_sreen(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl,bool* menu_open, bool* game_over,Sprite* p, Vector2<float> s_pos)
+{
+
+    Sprite sprit;
+    Texture tex;
+    rec_Button menu = rec_Button({150,75},Color::Black,{0,0},"Menu");
+    rec_Button restart = rec_Button({200,75},Color::Black,{0,0},"Restart");
+
+    tex.loadFromFile("sprites/GAME_lOSE.png");
+    tex.setSmooth(true);
+    sprit.setTexture(tex);
+
+    sprit.setPosition(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
+    sprit.setScale(window.getSize().x/sprit.getLocalBounds().width,window.getSize().y/sprit.getLocalBounds().height);
+
+    Vector2<float> pos = {window.getView().getCenter().x-400,window.getView().getCenter().y+250};
+    Vector2<float> pos2 = {window.getView().getCenter().x+257,window.getView().getCenter().y+250};
+
+
+
+    menu.rect.setPosition(pos);
+    restart.rect.setPosition(pos2);
+
+    if (menu.is_clicked(window)){
+        *menu_open = true;
+        *sc = 0;
+        *sl = 1;
+        *hl = 0;
+        *ang = 0;
+        *lvl = 0;
+        *game_over = false;
+        p->setPosition(s_pos);
+    }
+
+    if (restart.is_clicked(window)){
+        *sc = 0;
+        *sl = 1;
+        *hl = 0;
+        *ang = 0;
+        *lvl = 0;
+        *game_over = false;
+        p->setPosition(s_pos);
+    }
+
+
+    window.draw(sprit);
+    restart.draw(window);
+    menu.draw(window);
+
 }
 

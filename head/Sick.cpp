@@ -30,10 +30,12 @@ void Sick::draw_Seeck(RenderWindow &window){
     }
 }
 
-int Sick::update(float time, int level,int score)
+void Sick::update(float time, int level,int* score)
 {
     for (int i = 0; i < all_seeck.size(); i++)
     {
+
+
         if (all_seeck[i].open_lvl <= level)
         {
 
@@ -60,7 +62,7 @@ int Sick::update(float time, int level,int score)
                 else {
 
                     all_seeck[i].status = status_for_seeck::no;
-                    return score-10;
+                    *score-=100;
                 }
             }
             if (all_seeck[i].status == status_for_seeck::helping) {
@@ -72,5 +74,4 @@ int Sick::update(float time, int level,int score)
             }
         }
     }
-    return score;
 }

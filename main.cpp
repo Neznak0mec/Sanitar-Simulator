@@ -13,9 +13,11 @@ using namespace sf;
 
 int score = 0;
 int level = 0;
-int speed_lv = 0;
+int speed_lv = 1;
 int heal_lv = 0;
 int angry = 0;
+Vector2<float> p_start_position;
+
 
 Vector2<float> center(Sprite sprite)
 {
@@ -25,9 +27,9 @@ Vector2<float> center(Sprite sprite)
 
 float distance(Sprite sprite1, Sprite sprite2)
 {
-   Vector2<float> S1 = center(sprite1);
-   Vector2<float> S2 = center(sprite2);
-   return sqrt(pow(S1.x-S2.x,2) + pow(S1.y - S2.y, 2));
+    Vector2<float> S1 = center(sprite1);
+    Vector2<float> S2 = center(sprite2);
+    return sqrt(pow(S1.x-S2.x,2) + pow(S1.y - S2.y, 2));
 }
 
 Sick::sick_info nearest_sick(Sick &seeck, Sprite &player)
@@ -46,50 +48,137 @@ Sick::sick_info nearest_sick(Sick &seeck, Sprite &player)
     return seeck.all_seeck[index];
 }
 
-void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<Sprite>* colis, Player* player, nlohmann::json fil)
+void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<Sprite>* colis, Player* player,Object* floor,Object* book ,nlohmann::json fil, RenderWindow &window)
 {
+    srand(time(NULL));
+    std::vector<std::string> paths = {"sprites/floor/floor1.png","sprites/floor/floor2.png","sprites/floor/floor3.png","sprites/floor/floor4.png"};
+
+    int sizi = 0;
+    for (string str : map)
+        sizi += str.length();
+
+    int counter = 0;
+    float proc = sizi/100;
+    int progress = 0;
+
+    RectangleShape progress_bar;
+    progress_bar.setSize(Vector2f(progress,20));
+    progress_bar.setFillColor(Color::White);
+    progress_bar.setPosition(1000,700);
+
+    // loading sprite
+    Sprite load;
+    Texture load_texture;
+    load_texture.loadFromFile("sprites/loading.png");
+    load.setTexture(load_texture);
+    load.setPosition(Vector2f(965,610));
+    load.setScale(Vector2f(1.6,1));
+
+
+
     for (int i=0; i<map.size(); i++) {
         for (int j = 0; j < map[i].length(); j++)
         {
+            window.clear();
             string elem(1, map[i][j]);
-
 
             if (fil[elem]["type"].is_null() || elem == " ")
             {
-                continue;
+                floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
             }
 
 
-            if (fil[elem]["type"].get<string>()=="wall")
+            else if (fil[elem]["type"].get<string>()=="wall")
             {
-                walls->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), fil[elem]["auto_scale"].get<bool>());
+                Vector2i size = {0,0};
+                if (!fil[elem]["size"].empty())
+                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+
+                bool scale = false;
+                if (!fil[elem]["auto_scale"].empty())
+                    scale = fil[elem]["auto_scale"].get<bool>();
+                walls->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64),scale ,size);
 
                 colis->push_back(walls->Objects[walls->Objects.size()-1]);
             }
 
 
-            if (fil[elem]["type"].get<string>()=="obj")
+            else if (fil[elem]["type"].get<string>()=="obj")
             {
-                obj->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), fil[elem]["auto_scale"].get<bool>());
+                Vector2i size = {0,0};
+                if (!fil[elem]["size"].empty())
+                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+
+                bool scale = false;
+                if (!fil[elem]["auto_scale"].empty())
+                    scale = fil[elem]["auto_scale"].get<bool>();
+                obj->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), scale ,size);
+
 
                 if (fil[elem]["collision"].get<bool>())
                     colis->push_back(obj->Objects[obj->Objects.size()-1]);
+
+                floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
             }
 
 
-            if (fil[elem]["type"].get<string>()=="sick")
+            else if (fil[elem]["type"].get<string>()=="sick")
             {
-                Vector2<int> size = {fil[elem]["width"].get<int>(),fil[elem]["height"].get<int>()};
+
+                Vector2i size = {0,0};
+                if (!fil[elem]["size"].empty())
+                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+
+                bool scale = false;
+                if (!fil[elem]["auto_scale"].empty())
+                    scale = fil[elem]["auto_scale"].get<bool>();
 
                 sick->add_Seeck(Vector2f(j*64, i*64),fil[elem]["tex_path"].get<string>(),fil[elem]["lvl"].get<int>(),size);
                 colis->push_back(sick->all_seeck[sick->all_seeck.size()-1].sprite);
+                floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
             }
 
 
-            if (fil[elem]["type"].get<string>()=="player")
+            else if (fil[elem]["type"].get<string>()=="player")
             {
                 player->player.setPosition(Vector2f(j*64, i*64));
+                floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
+                p_start_position = Vector2f(j*64, i*64);
             }
+
+            else if (fil[elem]["type"].get<string>()=="book")
+            {
+                Vector2i size = {0,0};
+                if (!fil[elem]["size"].empty())
+                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+
+                bool scale = false;
+                if (!fil[elem]["auto_scale"].empty())
+                    scale = fil[elem]["auto_scale"].get<bool>();
+
+                book->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), scale,size);
+                floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
+                colis->push_back(walls->Objects[book->Objects.size()-1]);
+            }
+
+
+            Event event;
+
+            while (window.pollEvent(event)) {}
+
+            if (event.type == Event::Closed)
+                window.close();
+
+            counter++;
+            progress = counter/proc;
+            if (progress > 100)
+                progress = 100;
+            progress_bar.setSize(Vector2f(progress*2.847,20));
+
+
+            window.draw(load);
+            window.draw(progress_bar);
+            window.display();
         }
     }
 }
@@ -113,7 +202,7 @@ int may_help(Sick seeck,Player &player)
             {
                 if (seeck.all_seeck[i].id == ssa.id)
                 {
-                    score += 7;
+                    score += 90*(1+level/5);
                     return i;
                 }
             }
@@ -139,19 +228,17 @@ int main()
 
     window.setFramerateLimit(60);
     Clock clock;
-    float speed_up=1;
 
 
-
+    Object floor;
     Object all_objects;
     Sick seeck;
     Object walls;
     vector<Sprite> objects_with_collision;
+    Object book;
 
 
-    create_map(map,&walls,&all_objects,&seeck,&objects_with_collision,&player, jf);
-
-    UI::Button heal = UI::Button(Vector2f(20,20), "sprites/healing.png");
+    UI::Button heal = UI::Button(Vector2f(40,40), "sprites/healing.png");
 
     UI::Button exitB = UI::Button(Vector2f(50,50), "sprites/exit.png");
 
@@ -175,6 +262,14 @@ int main()
     string last_button = "";
 
     bool menu_open = true;
+    bool map_created = false;
+    bool upgrade_menu = false;
+    bool game_over = false;
+    bool FAQ_open =false;
+
+    UI::Upgrade_menu oba;
+
+    float speed_up = 1;
 
     while (window.isOpen())
     {
@@ -191,28 +286,35 @@ int main()
         }
 
 
+
+
         if (menu_open) {
-            menu_open = UI::menu(window, Mouse::getPosition(window));
+            menu_open = UI::menu(window, &FAQ_open);
             continue;
+        }
+
+        if (!map_created)
+        {
+            create_map(map,&walls,&all_objects,&seeck,&objects_with_collision,&player,&floor,&book, jf, window);
+            map_created = true;
         }
 
 
         time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
 
-        window.clear(Color::Green);
+        window.clear(Color(150,255,100));
 
         time_in_game += time/1000000;
 
-        if (pause)
+        if (pause || game_over)
             time = 0;
 
 
-
-        if (time_in_game > 1 and !pause)
+        if (time_in_game > 1 and !pause and !game_over)
         {
             int last_score = score;
-            score = seeck.update(time_in_game, level, score);
+            seeck.update(time_in_game, level, &score);
             if (score != last_score)
             {
                 angry++;
@@ -225,25 +327,45 @@ int main()
         else
             time_speed_up = time/1000;
 
-
-
-        player.update(window , time_speed_up ,speed_up*healing_status, &objects_with_collision);
-
         camera(window, player);
 
-        all_objects.draw_objects(window, player.player.getPosition());
+        floor.draw_objects(window, player.get_position());
 
-        walls.draw_objects(window , player.player.getPosition());
+        switch (speed_lv){
+            case 0:
+                speed_up = 1;
+                break;
+            case 1:
+                speed_up = 1.2;
+                break;
+
+            case 2:
+                speed_up = 1.5;
+                break;
+
+            case 3:
+                speed_up = 2;
+                break;
+        }
+
+        player.update(window, time_speed_up, speed_up * healing_status, &objects_with_collision);
+
+        all_objects.draw_objects(window, player.get_position());
+
+        walls.draw_objects(window , player.get_position());
 
         seeck.draw_Seeck(window);
 
+        book.draw_objects(window, player.get_position());
+
         player.draw_stamina(window);
 
-        top_bar.draw(window, score, speed_lv, heal_lv, angry);
+        exitB.draw(window,player.get_position().x+640,player.get_position().y-410);
+
+        top_bar.draw(window, score,speed_lv,heal_lv,angry);
 
         UI::Lamps::draw(window,seeck, level);
 
-        exitB.draw(window,player.player.getPosition().x+640,player.player.getPosition().y-410);
 
 
         if (distance(player.player,nearest_sick(seeck,player.player).sprite) < 100)
@@ -263,18 +385,52 @@ int main()
             }
             else{
                 healing_status =  1;
-            }
 
+            }
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::E))
+        if (distance(book.Objects[0],player.player)<100){
+            heal.set_tex("sprites/E.png");
+            heal.draw(window, 40+player.get_position().x, 40+player.get_position().y);
+        }
+
+
+        if (Keyboard::isKeyPressed(Keyboard::E) && last_button != "E")
         {
             int mh = may_help(seeck,player);
             if (mh != -1)
             {
                 seeck.all_seeck[mh].status = status_for_seeck::helping;
-                seeck.all_seeck[mh].time_have = 30;
+                switch (heal_lv)
+                {
+                    case 0:
+                        seeck.all_seeck[mh].time_have = 25;
+                        break;
+                    case 1:
+                        seeck.all_seeck[mh].time_have = 20;
+                        break;
+                    case 2:
+                        seeck.all_seeck[mh].time_have = 15;
+                        break;
+                    case 3:
+                        seeck.all_seeck[mh].time_have = 10;
+                        break;
+                }
             }
+            if(distance(book.Objects[0],player.player)<100){
+                if (upgrade_menu)
+                {
+                    pause = false;
+                    upgrade_menu = false;
+                }
+                else
+                {
+                    pause = true;
+                    upgrade_menu = true;
+                }
+
+            }
+            last_button = "E";
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Escape) and last_button != "escape")
@@ -287,18 +443,39 @@ int main()
             {
                 pause = true;
             }
+            if (upgrade_menu){
+                upgrade_menu = false;
+            }
             last_button = "escape";
         }
-        if (!Keyboard::isKeyPressed(Keyboard::Escape))
+
+        if (!Keyboard::isKeyPressed(Keyboard::Escape) && !Keyboard::isKeyPressed(Keyboard::E))
             last_button = "";
 
-        if (pause)
+        if (pause && !game_over)
         {
             pause_sprite.setPosition(window.getView().getCenter()-Vector2f(250,100));
             window.draw(pause_sprite);
         }
 
+        if (game_over)
+            UI::game_over_sreen(window,&score,&speed_lv,&heal_lv,&angry,&level,&menu_open,&game_over,&player.player,p_start_position);
 
+
+        if (upgrade_menu)
+        {
+            oba.update(window,&score,&speed_lv,&heal_lv,&angry,&level);
+            pause = true;
+        }
+
+        if (angry >= 3 || score < -100)
+        {
+            game_over = true;
+        }
+
+        window.setActive();
         window.display();
+
+
     }
 }

@@ -14,8 +14,6 @@ using namespace sf;
 
 namespace UI{
 
-
-
     class rec_Button{
         public:
         sf::RectangleShape rect;
@@ -64,7 +62,24 @@ namespace UI{
         static void draw(RenderWindow &window, Sick &sick,int lvl);
     };
 
-    bool menu(RenderWindow &window,Vector2<int> mouse_pos);
+
+    bool menu(RenderWindow &window,bool* FAQ_open);
+
+    class Upgrade_menu
+            {
+        bool is_clicked = false;
+        int help = 0;
+
+    public:
+        void update(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl);
+    };
+
+
+
+    void game_over_sreen(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl,bool* menu_open, bool* game_over,Sprite* p, Vector2<float> s_pos);
+
 };
+
+void FAQ_menu(RenderWindow &window, bool* FAQ_open);
 
 #endif //DURKACPP_UI_H

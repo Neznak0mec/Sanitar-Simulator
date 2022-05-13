@@ -11,7 +11,8 @@
         "B              BB                BB    B",
         "B              BB                      B",
         "B    B         BB         BB           B",
-        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"],
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+                ],
         "B":
         {
                 "type": "wall",

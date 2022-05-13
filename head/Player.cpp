@@ -132,7 +132,7 @@ void Player::staminas(float time) {
 void Player::draw_stamina(RenderWindow &window) {
     RectangleShape stamina_bar;
     stamina_bar.setSize(Vector2f(5, stamina*10));
-    stamina_bar.setPosition(player.getPosition().x - 290, player.getPosition().y );
+    stamina_bar.setPosition(player.getPosition().x - 640, player.getPosition().y );
     Color color(166, 0, 144);
     stamina_bar.setFillColor(color);
     window.draw(stamina_bar);

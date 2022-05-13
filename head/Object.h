@@ -14,7 +14,7 @@ public:
     std::vector<sf::Sprite> Objects;
     std::vector<sf::Texture> Tex;
     sf::Texture aba;
-    void create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale);
+    void create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale, sf::Vector2i size);
     void draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos);
 
 private:
