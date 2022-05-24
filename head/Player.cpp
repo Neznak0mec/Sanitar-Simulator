@@ -7,11 +7,18 @@
 Player::Player(float x, float y, Texture texture) {
     player_texture = texture;
     player.setTexture(player_texture);
-    player.setPosition(x,y);
     player.setScale({0.5,0.5});
+
+    inv_player_tex.loadFromFile("sprites/hit_box.png");
+    inv_player.setTexture(inv_player_tex);
+    inv_player.setScale({0.5,0.5});
+    inv_player.setPosition(x,y);
+
 }
 
 void Player::update(RenderWindow &window, float time_speed_up, float speed_up, vector<Sprite> *objects) {
+
+
     if ((Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed((Keyboard::Up)) )&& (Keyboard::isKeyPressed((Keyboard::S)) || Keyboard::isKeyPressed((Keyboard::Down))))
         moveX = 0;
 
@@ -45,7 +52,6 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
         moveX = -speed;
         moveY = speed;
     }
-
     else if((Keyboard::isKeyPressed((Keyboard::W)) || Keyboard::isKeyPressed(Keyboard::Up)) && (Keyboard::isKeyPressed((Keyboard::A))|| Keyboard::isKeyPressed(Keyboard::Left)))
     {
         moveX = -speed;
@@ -67,31 +73,38 @@ void Player::update(RenderWindow &window, float time_speed_up, float speed_up, v
 
     staminas(time_speed_up);
 
-    //collision with wall
-    int player_x_ = player.getPosition().x;
-    int player_y_ = player.getPosition().y;
 
-    int player_x = player.getPosition().x+moveY*time_speed_up*speed_up*stamina_speed_up;
-    int player_y = player.getPosition().y+moveX*time_speed_up*speed_up*stamina_speed_up;
+    int player_x_ = inv_player.getPosition().x;
+    int player_y_ = inv_player.getPosition().y;
+
+    int player_x = inv_player.getPosition().x+moveY*time_speed_up*speed_up*stamina_speed_up;
+    int player_y = inv_player.getPosition().y+moveX*time_speed_up*speed_up*stamina_speed_up;
 
 
 
 
     for (auto obj : *objects)
     {
-            if (collision_wall(player_x_, player_y, &obj))
+            if (collision_wall(player_x_, player_y, &obj, &inv_player))
             {
                 moveX = 0;
             }
-            if (collision_wall(player_x, player_y_, &obj))
+            if (collision_wall(player_x, player_y_, &obj, &inv_player))
             {
                 moveY = 0;
             }
     }
 
-    player.move(moveY*time_speed_up*speed_up*stamina_speed_up,moveX*time_speed_up*speed_up*stamina_speed_up);
+    inv_player.move(moveY*time_speed_up*speed_up*stamina_speed_up,moveX*time_speed_up*speed_up*stamina_speed_up);
+
+    Vector2<float> cent_pos;
+    cent_pos.x = inv_player.getPosition().x+inv_player.getTexture()->getSize().x/2;
+    cent_pos.y = inv_player.getPosition().y+inv_player.getTexture()->getSize().y/2;
+
+    player.setPosition(cent_pos.x-player.getLocalBounds().width/2*player.getScale().x,cent_pos.y-player.getLocalBounds().height/2*player.getScale().y);
 
     window.draw(player);
+
 }
 
 void Player::staminas(float time) {
@@ -129,20 +142,6 @@ void Player::staminas(float time) {
     }
 }
 
-void Player::draw_stamina(RenderWindow &window) {
-    RectangleShape stamina_bar;
-    stamina_bar.setSize(Vector2f(5, stamina*10));
-    stamina_bar.setPosition(player.getPosition().x - 640, player.getPosition().y );
-    Color color(166, 0, 144);
-    stamina_bar.setFillColor(color);
-    window.draw(stamina_bar);
-}
-
-
-Vector2<float> Player::get_position() {
-    return player.getPosition();
-}
-
 Vector2<float> Player::get_center() {
     Vector2<float> position;
     position.x = player.getPosition().x+player.getTexture()->getSize().x/2;
@@ -150,13 +149,13 @@ Vector2<float> Player::get_center() {
     return position;
 }
 
-bool Player::collision_wall(int player_x, int player_y, Sprite* obj) {
+bool Player::collision_wall(int player_x, int player_y, Sprite* obj, Sprite* hit) {
     int wall_x = obj->getPosition().x;
     int wall_y = obj->getPosition().y;
 
     float scale_x = obj->getScale().x;
     float scale_y = obj->getScale().y;
 
-    return (player_x + 32 >= wall_x && player_x <= wall_x + obj->getLocalBounds().width*scale_x)
-    && (player_y + 62 >= wall_y && player_y <= wall_y + obj->getLocalBounds().height*scale_y);
+    return (player_x + hit->getLocalBounds().width >= wall_x && player_x <= wall_x + obj->getLocalBounds().width*scale_x)
+    && (player_y + hit->getLocalBounds().height >= wall_y && player_y <= wall_y + obj->getLocalBounds().height*scale_y);
 }

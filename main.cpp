@@ -61,17 +61,19 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
     float proc = sizi/100;
     int progress = 0;
 
+    Vector2<float> start_pos = {window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2};
+
     RectangleShape progress_bar;
     progress_bar.setSize(Vector2f(progress,20));
     progress_bar.setFillColor(Color::White);
-    progress_bar.setPosition(1000,700);
+    progress_bar.setPosition(start_pos.x+1000,start_pos.y+700);
 
     // loading sprite
     Sprite load;
     Texture load_texture;
     load_texture.loadFromFile("sprites/loading.png");
     load.setTexture(load_texture);
-    load.setPosition(Vector2f(965,610));
+    load.setPosition(Vector2f(start_pos.x+965,start_pos.y+610));
     load.setScale(Vector2f(1.6,1));
 
 
@@ -90,9 +92,9 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
 
             else if (fil[elem]["type"].get<string>()=="wall")
             {
-                Vector2i size = {0,0};
+                Vector2f size = {0,0};
                 if (!fil[elem]["size"].empty())
-                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+                    size = {fil[elem]["size"].get<vector<float>>()[0],fil[elem]["size"].get<vector<float>>()[1]};
 
                 bool scale = false;
                 if (!fil[elem]["auto_scale"].empty())
@@ -105,13 +107,15 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
 
             else if (fil[elem]["type"].get<string>()=="obj")
             {
-                Vector2i size = {0,0};
+                Vector2f size = {0,0};
                 if (!fil[elem]["size"].empty())
-                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+                    size = {fil[elem]["size"].get<vector<float>>()[0],fil[elem]["size"].get<vector<float>>()[1]};
 
                 bool scale = false;
                 if (!fil[elem]["auto_scale"].empty())
                     scale = fil[elem]["auto_scale"].get<bool>();
+
+
                 obj->create_object(fil[elem]["tex_path"].get<string>(), Vector2f(j*64, i*64), scale ,size);
 
 
@@ -141,16 +145,16 @@ void create_map(vector<string> map,Object* walls,Object* obj,Sick* sick,vector<S
 
             else if (fil[elem]["type"].get<string>()=="player")
             {
-                player->player.setPosition(Vector2f(j*64, i*64));
+                player->inv_player.setPosition(Vector2f(j*64, i*64));
                 floor->create_object(paths[rand()%4], Vector2f(j*64, i*64), true,{0,0});
                 p_start_position = Vector2f(j*64, i*64);
             }
 
             else if (fil[elem]["type"].get<string>()=="book")
             {
-                Vector2i size = {0,0};
+                Vector2f size = {0,0};
                 if (!fil[elem]["size"].empty())
-                    size = {fil[elem]["size"].get<vector<int>>()[0],fil[elem]["size"].get<vector<int>>()[1]};
+                    size = {fil[elem]["size"].get<vector<float>>()[0],fil[elem]["size"].get<vector<float>>()[1]};
 
                 bool scale = false;
                 if (!fil[elem]["auto_scale"].empty())
@@ -217,8 +221,13 @@ int main()
     RenderWindow window(VideoMode(1400, 840), "ha-ha");
 
     fstream file("map.json");
-    nlohmann::json jf = nlohmann::json::parse(file);
-    vector<string> map = jf["map"].get<std::vector<string>>();
+    nlohmann::json mapjs = nlohmann::json::parse(file);
+    vector<string> map = mapjs["map"].get<std::vector<string>>();
+    file.close();
+
+    fstream file2("guide.json");
+    nlohmann::json guidejs = nlohmann::json::parse(file2);
+    vector<string> guide = guidejs["map"].get<std::vector<string>>();
     file.close();
 
     Texture playerTexture;
@@ -241,6 +250,8 @@ int main()
     UI::Button heal = UI::Button(Vector2f(40,40), "sprites/healing.png");
 
     UI::Button exitB = UI::Button(Vector2f(50,50), "sprites/exit.png");
+
+    UI::rec_Button to_menu = UI::rec_Button({150,75},Color::Black,{0,0},"Menu");
 
 
     float time_in_game = 0;
@@ -265,7 +276,7 @@ int main()
     bool map_created = false;
     bool upgrade_menu = false;
     bool game_over = false;
-    bool FAQ_open =false;
+    bool guide_is = false;
 
     UI::Upgrade_menu oba;
 
@@ -288,14 +299,34 @@ int main()
 
 
 
-        if (menu_open) {
-            menu_open = UI::menu(window, &FAQ_open);
+        if (menu_open)
+        {
+            if (map_created)
+            {
+                walls = {};
+                all_objects= {};
+                seeck ={};
+                objects_with_collision  = {};
+                floor = {};
+                book = {};
+                map_created = false;
+            }
+            menu_open = UI::menu(window, &guide_is);
             continue;
         }
 
         if (!map_created)
         {
-            create_map(map,&walls,&all_objects,&seeck,&objects_with_collision,&player,&floor,&book, jf, window);
+
+            if (guide_is)
+            {
+                guide_is = false;
+                create_map(guide,&walls,&all_objects,&seeck,&objects_with_collision,&player,&floor,&book, guidejs, window);
+            }
+            else
+            {
+                create_map(map,&walls,&all_objects,&seeck,&objects_with_collision,&player,&floor,&book, mapjs, window);
+            }
             map_created = true;
         }
 
@@ -329,7 +360,7 @@ int main()
 
         camera(window, player);
 
-        floor.draw_objects(window, player.get_position());
+        floor.draw_objects(window, player.get_center());
 
         switch (speed_lv){
             case 0:
@@ -350,17 +381,15 @@ int main()
 
         player.update(window, time_speed_up, speed_up * healing_status, &objects_with_collision);
 
-        all_objects.draw_objects(window, player.get_position());
+        all_objects.draw_objects(window, window.getView().getCenter());
 
-        walls.draw_objects(window , player.get_position());
+        walls.draw_objects(window , window.getView().getCenter());
 
         seeck.draw_Seeck(window);
 
-        book.draw_objects(window, player.get_position());
+        book.draw_objects(window, window.getView().getCenter());
 
-        player.draw_stamina(window);
-
-        exitB.draw(window,player.get_position().x+640,player.get_position().y-410);
+        exitB.draw(window,window.getView().getCenter().x+640,window.getView().getCenter().y-410);
 
         top_bar.draw(window, score,speed_lv,heal_lv,angry);
 
@@ -373,7 +402,7 @@ int main()
             if (nearest_sick(seeck,player.player).status == status_for_seeck::helping){
                 healing_status = 0;
                 heal.set_tex("sprites/healing.png");
-                heal.draw(window, 40+player.get_position().x, 40+player.get_position().y);
+                heal.draw(window, 40+player.get_center().x, 40+player.get_center().y);
 
             }
 
@@ -381,7 +410,7 @@ int main()
             {
                 healing_status = 1;
                 heal.set_tex("sprites/E.png");
-                heal.draw(window, 40+player.get_position().x, 40+player.get_position().y);
+                heal.draw(window, 40+player.get_center().x, 40+player.get_center().y);
             }
             else{
                 healing_status =  1;
@@ -391,7 +420,7 @@ int main()
 
         if (distance(book.Objects[0],player.player)<100){
             heal.set_tex("sprites/E.png");
-            heal.draw(window, 40+player.get_position().x, 40+player.get_position().y);
+            heal.draw(window, 40+player.get_center().x, 40+player.get_center().y);
         }
 
 
@@ -455,11 +484,18 @@ int main()
         if (pause && !game_over)
         {
             pause_sprite.setPosition(window.getView().getCenter()-Vector2f(250,100));
+            to_menu.set_pos(window.getView().getCenter()+Vector2f(-100,200));
+            to_menu.draw(window);
+
+            if (to_menu.is_clicked(window))
+            {
+                menu_open = true;
+            }
             window.draw(pause_sprite);
         }
 
         if (game_over)
-            UI::game_over_sreen(window,&score,&speed_lv,&heal_lv,&angry,&level,&menu_open,&game_over,&player.player,p_start_position);
+            UI::game_over_sreen(window,&score,&speed_lv,&heal_lv,&angry,&level,&menu_open,&game_over,&player.inv_player,p_start_position);
 
 
         if (upgrade_menu)

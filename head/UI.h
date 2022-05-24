@@ -25,6 +25,8 @@ namespace UI{
 
         bool is_clicked(RenderWindow &window);
 
+        void set_pos(Vector2f pos);
+
     };
 
     class Button{
@@ -63,7 +65,7 @@ namespace UI{
     };
 
 
-    bool menu(RenderWindow &window,bool* FAQ_open);
+    bool menu(RenderWindow &window, bool* guide_is);
 
     class Upgrade_menu
             {
@@ -79,7 +81,5 @@ namespace UI{
     void game_over_sreen(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl,bool* menu_open, bool* game_over,Sprite* p, Vector2<float> s_pos);
 
 };
-
-void FAQ_menu(RenderWindow &window, bool* FAQ_open);
 
 #endif //DURKACPP_UI_H

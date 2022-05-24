@@ -39,14 +39,17 @@ void Object::draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos) {
 
 }
 
-void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale, sf::Vector2i size) {
+void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale, sf::Vector2f size) {
+    if (texture_path == "sprites/Objects/vending_left.png"){
+        printf("Error load texture");
+    }
+
     if(!aba.loadFromFile(texture_path))
     {
         printf("Error load texture");
         return;
     }
     aba.setSmooth(true);
-    aba.setRepeated(false);
     object.setTexture(aba);
     Tex.push_back(aba);
     int width = object.getTexture()->getSize().x;
@@ -67,6 +70,9 @@ void Object::create_object(std::string texture_path, sf::Vector2f pos, bool auto
 
     if (!auto_scale && size.x != 0 && size.y != 0) {
         object.setScale(size.x / width, size.y / height);
+    }
+    else{
+        object.setScale(0.5f, 0.5f);
     }
     object.setPosition(pos.x,pos.y);
 

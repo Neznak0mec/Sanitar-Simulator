@@ -37,6 +37,17 @@ bool UI::rec_Button::is_clicked(RenderWindow &window) {
     return false;
 }
 
+void UI::rec_Button::set_pos(Vector2f pos)
+{
+    rect.setPosition(pos.x, pos.y);
+    sf::Text text;
+    text.setString(text_button);
+    Font font;
+    font.loadFromFile("fonts/Agit_Prop.ttf");
+    text.setFont(font);
+    text.setPosition(rect.getPosition().x+20, rect.getPosition().y+18);
+}
+
 
 UI::Button::Button(Vector2<float> size, string tex_path) {
     shape.setSize(size);
@@ -159,32 +170,8 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
 
 };
 
-void FAQ_menu(RenderWindow &window, bool* FAQ_open)
-{
-    Sprite sprite;
-    Texture tex;
 
-    tex.loadFromFile("sprites/FAQ.png");
-    tex.setSmooth(true);
-    sprite.setTexture(tex);
-
-    sprite.setPosition(200,200);
-
-    UI::Button close = UI::Button({65,64},"sprites/menu_close.png");
-
-    window.draw(sprite);
-    close.draw(window, window.getView().getCenter().x+400, window.getView().getCenter().y-400);
-
-    if (close.is_clicked(window))
-    {
-        *FAQ_open = false;
-    }
-
-
-}
-
-
-bool UI::menu(RenderWindow &window, bool* FAQ_open){
+bool UI::menu(RenderWindow &window,bool* guide_is){
     Sprite background;
     Texture texture;
     texture.loadFromFile("sprites/menu_back_ground.png");
@@ -203,8 +190,8 @@ bool UI::menu(RenderWindow &window, bool* FAQ_open){
     auto start = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+400),"Start");
     start.draw(window);
 
-    auto FAQ = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+500),"FAQ");
-    FAQ.draw(window);
+    auto guide = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+500),"Guide");
+    guide.draw(window);
 
     if (start.is_clicked(window))
     {
@@ -212,12 +199,10 @@ bool UI::menu(RenderWindow &window, bool* FAQ_open){
     }
 
 
-    if (FAQ.is_clicked(window)){
-        *FAQ_open = true;
+    if (guide.is_clicked(window)){
+        *guide_is = true;
+        return false;
     }
-
-    if (*FAQ_open)
-        FAQ_menu(window, FAQ_open);
 
     window.display();
 

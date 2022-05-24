@@ -6,6 +6,7 @@
 #define DURKACPP_PLAYER_H
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include <iostream>
 #include "Object.h"
 using namespace sf;
 using namespace std;
@@ -14,13 +15,13 @@ using namespace std;
 class Player {
 public:
     Sprite player;
+    Sprite inv_player;
+    Texture inv_player_tex;
     Texture player_texture;
     Player(float x, float y, Texture texture);
     void update(RenderWindow &window, float time_speed_up, float speed_up, vector<Sprite> *objects);
     void staminas(float time);
-    void draw_stamina(RenderWindow &window);
-    static bool collision_wall(int player_x, int player_y, Sprite* obj);
-    Vector2<float> get_position();
+    static bool collision_wall(int player_x, int player_y, Sprite* obj, Sprite* hit);
     Vector2<float> get_center();
 
 private:
