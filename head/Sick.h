@@ -1,12 +1,9 @@
-//
-// Created by noname on 15.04.22.
-//
 #include <SFML/Graphics.hpp>
-#include <iostream>
+
 using namespace sf;
 using namespace std;
-#ifndef DURKACPP_SICK_H
-#define DURKACPP_SICK_H
+#ifndef GAME_SICK_H
+#define GAME_SICK_H
 
 
 enum class status_for_seeck {
@@ -16,11 +13,11 @@ enum class status_for_seeck {
     helping
 };
 
-class Sick{
+class Sick {
 public:
 
 
-    struct sick_info{
+    struct sick_info {
         int id;
         int open_lvl;
         status_for_seeck status;
@@ -31,13 +28,13 @@ public:
 
     vector<sick_info> all_seeck;
 
-    void add_Seeck(Vector2f cords, string textures_path, int open_lvls,Vector2<int> size);
+    void add_Seeck(Vector2f cords, string textures_path, int open_lvls, Vector2<int> size);
 
     void draw_Seeck(RenderWindow &window);
 
-    void update(float time, int level, int* score);
+    void update(float time, int level, int *score, int *angry);
 
 };
 
 
-#endif //DURKACPP_SICK_H
+#endif

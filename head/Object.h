@@ -1,20 +1,18 @@
-//
-// Created by smers on 02.04.2022.
-//
 #include <SFML/Graphics.hpp>
 #include <math.h>
-#ifndef DURKACPP_OBJECT_H
-#define DURKACPP_OBJECT_H
 
+#ifndef GAME_OBJECT_H
+#define GAME_OBJECT_H
 
 
 class Object {
-
 public:
     std::vector<sf::Sprite> Objects;
     std::vector<sf::Texture> Tex;
     sf::Texture aba;
+
     void create_object(std::string texture_path, sf::Vector2f pos, bool auto_scale, sf::Vector2f size);
+
     void draw_objects(sf::RenderWindow &window, sf::Vector2<float> pos);
 
 private:
@@ -22,4 +20,4 @@ private:
 };
 
 
-#endif //DURKACPP_OBJECT_H
+#endif 

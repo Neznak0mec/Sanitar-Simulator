@@ -1,6 +1,3 @@
-//
-// Created by smers on 05.04.2022.
-//
 
 #include "UI.h"
 
@@ -18,34 +15,26 @@ void UI::rec_Button::draw(RenderWindow &window) {
     Font font;
     font.loadFromFile("fonts/Agit_Prop.ttf");
     text.setFont(font);
-    text.setPosition(rect.getPosition().x+20, rect.getPosition().y+18);
+    text.setPosition(rect.getPosition().x + 20, rect.getPosition().y + 18);
     window.draw(text);
 }
 
 bool UI::rec_Button::is_clicked(RenderWindow &window) {
     Vector2<int> pos = Mouse::getPosition(window);
-    float but_x = rect.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x/2;
-    float but_y = rect.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y/2;
 
-    if (pos.x > but_x && pos.x < but_x + rect.getSize().x && pos.y > but_y && pos.y < but_y + rect.getSize().y)
-    {
-        if (Mouse::isButtonPressed(Mouse::Left))
-        {
+    float but_x = rect.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x / 2;
+    float but_y = rect.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y / 2;
+
+    if (pos.x > but_x && pos.x < but_x + rect.getSize().x && pos.y > but_y && pos.y < but_y + rect.getSize().y) {
+        if (Mouse::isButtonPressed(Mouse::Left)) {
             return true;
         }
     }
     return false;
 }
 
-void UI::rec_Button::set_pos(Vector2f pos)
-{
+void UI::rec_Button::set_pos(Vector2f pos) {
     rect.setPosition(pos.x, pos.y);
-    sf::Text text;
-    text.setString(text_button);
-    Font font;
-    font.loadFromFile("fonts/Agit_Prop.ttf");
-    text.setFont(font);
-    text.setPosition(rect.getPosition().x+20, rect.getPosition().y+18);
 }
 
 
@@ -55,7 +44,7 @@ UI::Button::Button(Vector2<float> size, string tex_path) {
     shape.setTexture(&tex);
 }
 
-void UI::Button::draw(RenderWindow &window,float pos1, float pos2) {
+void UI::Button::draw(RenderWindow &window, float pos1, float pos2) {
     shape.setPosition(pos1, pos2);
     window.draw(shape);
 }
@@ -66,16 +55,14 @@ void UI::Button::set_tex(string tex_path) {
     shape.setTexture(&tex);
 }
 
-bool UI::Button::is_clicked(RenderWindow &window)
-{
+bool UI::Button::is_clicked(RenderWindow &window) {
     Vector2<int> pos = Mouse::getPosition(window);
-    float but_x = shape.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x/2;
-    float but_y = shape.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y/2;
 
-    if (pos.x > but_x && pos.x < but_x + shape.getSize().x && pos.y > but_y && pos.y < but_y + shape.getSize().y)
-    {
-        if (Mouse::isButtonPressed(Mouse::Left))
-        {
+    float but_x = shape.getPosition().x - window.getView().getCenter().x + window.getView().getSize().x / 2;
+    float but_y = shape.getPosition().y - window.getView().getCenter().y + window.getView().getSize().y / 2;
+
+    if (pos.x > but_x && pos.x < but_x + shape.getSize().x && pos.y > but_y && pos.y < but_y + shape.getSize().y) {
+        if (Mouse::isButtonPressed(Mouse::Left)) {
             return true;
         }
     }
@@ -90,80 +77,74 @@ UI::Top_Bar::Top_Bar(Vector2<float> size, Vector2<float> pos, string tex_path) {
     shape.setPosition(pos);
 }
 
-void UI::Top_Bar::draw(RenderWindow &window,int sc ,int sl, int hl, int ang)
-{
+void UI::Top_Bar::draw(RenderWindow &window, int sc, int sl, int hl, int ang) {
     float x = window.getView().getCenter().x;
     float y = window.getView().getCenter().y;
-    shape.setPosition(x-550, y-420 );
 
+    shape.setPosition(x - 550, y - 420);
     Font font;
     font.loadFromFile("fonts/Agit_Prop.ttf");
+
     Text text;
     text.setFont(font);
     text.setString(to_string(sc));
     text.setCharacterSize(50);
-    text.setPosition(x-250, y-410);
+    text.setPosition(x - 250, y - 410);
     text.setFillColor(Color::Black);
-
 
     window.draw(shape);
     window.draw(text);
-
-    text.setString(to_string(sl-1));
-    text.setPosition(x+40, y-410);
+    text.setString(to_string(sl - 1));
+    text.setPosition(x + 40, y - 410);
     window.draw(text);
 
     text.setString(to_string(hl));
-    text.setPosition(x+220, y-410);
+    text.setPosition(x + 220, y - 410);
     window.draw(text);
 
     text.setString(to_string(ang));
-    text.setPosition(x+400, y-410);
+    text.setPosition(x + 400, y - 410);
     window.draw(text);
 }
 
 
-void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
-    float w = window.getView().getCenter().x;
+void UI::draw_lamps(RenderWindow &window, Sick &sick, int lvl) {
+    float x = window.getView().getCenter().x;
     float y = window.getView().getCenter().y;
     y = y + 380;
-    double center = w;
+
+    double center = x;
 
     vector<Sick::sick_info> objects;
+
     for (int i = 0; i < sick.all_seeck.size(); ++i)
         if (sick.all_seeck[i].open_lvl <= lvl)
             objects.push_back(sick.all_seeck[i]);
-
     Text text;
     Font font;
     font.loadFromFile("fonts/Agit_Prop.ttf");
     text.setFont(font);
     text.setCharacterSize(30);
     text.setFillColor(Color::Black);
-    CircleShape circle(60);
 
+    CircleShape circle(60);
     double startPosition = center - (objects.size() * 60 + (objects.size() - 1) * 5);
 
-
     for (int i = 0; i < objects.size(); ++i) {
-        if (objects[i].status == status_for_seeck::need_help)
-        {
-            if ( 20 < objects[i].time_have < 30)
-                circle.setFillColor(Color::Green);
-            if (10 < objects[i].time_have <= 20)
-                circle.setFillColor(Color::Yellow);
+
+        if (objects[i].status == status_for_seeck::need_help) {
             if (objects[i].time_have < 10)
                 circle.setFillColor(Color::Red);
-        }
-        else
+            else if (objects[i].time_have < 20)
+                circle.setFillColor(Color::Yellow);
+            else
+                circle.setFillColor(Color::Green);
+        } else
             circle.setFillColor(Color::White);
 
-        text.setString(to_string(i+1));
-
-        circle.setPosition(startPosition + i * 120, y );
-
-        text.setPosition(startPosition + i * 120+50, y );
-
+        text.setString(to_string(i + 1));
+        circle.setPosition(startPosition + i * 120, y);
+        text.setPosition(startPosition + i * 120 + 50, y);
         window.draw(circle);
         window.draw(text);
     }
@@ -171,81 +152,79 @@ void UI::Lamps::draw(RenderWindow &window,Sick &sick,int lvl) {
 };
 
 
-bool UI::menu(RenderWindow &window,bool* guide_is){
+bool UI::menu(RenderWindow &window, bool *guide_is) {
     Sprite background;
     Texture texture;
+
     texture.loadFromFile("sprites/menu_back_ground.png");
     texture.setSmooth(true);
     background.setTexture(texture);
+    background.setPosition(window.getView().getCenter().x - window.getView().getSize().x / 2,
+                           window.getView().getCenter().y - window.getView().getSize().y / 2);
+    background.setScale(window.getSize().x / background.getLocalBounds().width,
+                        window.getSize().y / background.getLocalBounds().height);
 
-    background.setPosition(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
-    background.setScale(window.getSize().x/background.getLocalBounds().width,window.getSize().y/background.getLocalBounds().height);
-
-    Vector2<float> pos0 = Vector2<float>(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
+    Vector2<float> pos0 = Vector2<float>(window.getView().getCenter().x - window.getView().getSize().x / 2,
+                                         window.getView().getCenter().y - window.getView().getSize().y / 2);
 
     window.clear();
-
     window.draw(background);
+    auto start = rec_Button(Vector2<float>(150, 75), Color::Black, Vector2<float>(pos0.x + 100, pos0.y + 400), "Start");
 
-    auto start = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+400),"Start");
     start.draw(window);
 
-    auto guide = rec_Button(Vector2<float>(150,75),Color::Black,Vector2<float>(pos0.x+100,pos0.y+500),"Guide");
+    auto guide = rec_Button(Vector2<float>(150, 75), Color::Black, Vector2<float>(pos0.x + 100, pos0.y + 500), "Guide");
+
     guide.draw(window);
 
-    if (start.is_clicked(window))
-    {
+    if (start.is_clicked(window)) {
         return false;
     }
 
-
-    if (guide.is_clicked(window)){
+    if (guide.is_clicked(window)) {
         *guide_is = true;
         return false;
     }
 
     window.display();
-
     return true;
 }
 
-void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl) {
+void UI::Upgrade_menu::update(RenderWindow &window, int *sc, int *sl, int *hl, int *ang, int *lvl) {
 
 
     Sprite background;
     Texture texture;
     texture.loadFromFile("sprites/Objects/clear_book.png");
     texture.setSmooth(true);
+
     background.setTexture(texture);
-    background.setScale(4,4);
+    background.setScale(4, 4);
 
-
-    Button speed_upgrade(Vector2<float>(300,150),"sprites/buttons/yskorin_ru.png");
-
-    Button heal_upgrade(Vector2<float>(300,150),"sprites/buttons/yzbogoin_ru.png");
-    Button lvl_upgrade(Vector2<float>(300,150),"sprites/buttons/lv_1_ru.png");
-    Button ang_downgrade(Vector2<float>(300,150),"sprites/buttons/angry_1_ru.png");
+    Button speed_upgrade(Vector2<float>(300, 150), "sprites/buttons/yskorin_ru.png");
+    Button heal_upgrade(Vector2<float>(300, 150), "sprites/buttons/yzbogoin_ru.png");
+    Button lvl_upgrade(Vector2<float>(300, 150), "sprites/buttons/lv_1_ru.png");
+    Button ang_downgrade(Vector2<float>(300, 150), "sprites/buttons/angry_1_ru.png");
 
     int speed_cost;
     int heal_cost;
     int lvl_cost;
     int help_cost;
 
-    //button for upgrade speed
     switch (*sl) {
         case 1:
             speed_upgrade.set_tex("sprites/buttons/yskorin_ru.png");
-            speed_cost = 100;
+            speed_cost = 450;
             break;
 
         case 2:
             speed_upgrade.set_tex("sprites/buttons/yskorin+_ru.png");
-            speed_cost = 100;
+            speed_cost = 600;
             break;
 
         case 3:
             speed_upgrade.set_tex("sprites/buttons/yskorin++_ru.png");
-            speed_cost = 100;
+            speed_cost = 900;
             break;
 
         case 4:
@@ -257,17 +236,17 @@ void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, in
     switch (*hl) {
         case 0:
             heal_upgrade.set_tex("sprites/buttons/yzbogoin_ru.png");
-            heal_cost = 100;
+            heal_cost = 300;
             break;
 
         case 1:
             heal_upgrade.set_tex("sprites/buttons/yzbogoin+_ru.png");
-            heal_cost = 100;
+            heal_cost = 700;
             break;
 
         case 2:
             heal_upgrade.set_tex("sprites/buttons/yzbogoin++_ru.png");
-            heal_cost = 100;
+            heal_cost = 1500;
             break;
 
         case 3:
@@ -280,12 +259,12 @@ void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, in
     switch (*lvl) {
         case 0:
             lvl_upgrade.set_tex("sprites/buttons/lv_1_ru.png");
-            lvl_cost = 100;
+            lvl_cost = 1000;
             break;
 
         case 1:
             lvl_upgrade.set_tex("sprites/buttons/lv_2_ru.png");
-            lvl_cost = 100;
+            lvl_cost = 2000;
             break;
 
         case 2:
@@ -294,15 +273,16 @@ void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, in
             break;
     }
 
+
     switch (help) {
         case 0:
             ang_downgrade.set_tex("sprites/buttons/angry_1_ru.png");
-            help_cost = 100;
+            help_cost = 1000;
             break;
 
         case 1:
             ang_downgrade.set_tex("sprites/buttons/angry_2_ru.png");
-            help_cost = 100;
+            help_cost = 2000;
             break;
 
         case 2:
@@ -312,19 +292,19 @@ void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, in
 
     }
 
-    int start_x = window.getView().getCenter().x - window.getView().getSize().x/2;
-    int start_y = window.getView().getCenter().y - window.getView().getSize().y/2;
+    float start_x = window.getView().getCenter().x - window.getView().getSize().x / 2;
+    float start_y = window.getView().getCenter().y - window.getView().getSize().y / 2;
 
-    background.setPosition({static_cast<float>(start_x+220),static_cast<float>(start_y+100)});
+    background.setPosition({start_x + 220, start_y + 100});
     window.draw(background);
-    speed_upgrade.draw(window,start_x+300,start_y+200);
-    heal_upgrade.draw(window,start_x+800,start_y+200);
-    lvl_upgrade.draw(window,start_x+300,start_y+425);
-    ang_downgrade.draw(window,start_x+800,start_y+425);
 
+    speed_upgrade.draw(window, start_x + 300, start_y + 200);
+    heal_upgrade.draw(window, start_x + 800, start_y + 200);
+    lvl_upgrade.draw(window, start_x + 300, start_y + 425);
+    ang_downgrade.draw(window, start_x + 800, start_y + 425);
 
-    if (Mouse::isButtonPressed(Mouse::Left)){
-        if ( !is_clicked) {
+    if (Mouse::isButtonPressed(Mouse::Left)) {
+        if (!is_clicked) {
             if (speed_upgrade.is_clicked(window) && *sc >= speed_cost) {
                 *sc -= speed_cost;
                 *sl += 1;
@@ -340,46 +320,47 @@ void UI::Upgrade_menu::update(RenderWindow &window,int* sc ,int* sl, int* hl, in
                 *lvl += 1;
             }
 
-            if (ang_downgrade.is_clicked(window) && *sc >= help_cost && *ang>1) {
+            if (ang_downgrade.is_clicked(window) && *sc >= help_cost && *ang > 1) {
                 *sc -= help_cost;
                 help++;
-                *ang-=1;
+                *ang -= 1;
             }
 
         }
         is_clicked = true;
-    }
-    else
+    } else
         is_clicked = false;
 
 
 };
 
 
-void UI::game_over_sreen(RenderWindow &window,int* sc ,int* sl, int* hl, int* ang, int* lvl,bool* menu_open, bool* game_over,Sprite* p, Vector2<float> s_pos)
-{
+void UI::game_over_sreen(RenderWindow &window, int *sc, int *sl, int *hl, int *ang, int *lvl, bool *menu_open,
+                         bool *game_over, Sprite *p, Vector2<float> s_pos) {
 
     Sprite sprit;
     Texture tex;
-    rec_Button menu = rec_Button({150,75},Color::Black,{0,0},"Menu");
-    rec_Button restart = rec_Button({200,75},Color::Black,{0,0},"Restart");
+    rec_Button menu = rec_Button({150, 75}, Color::Black, {0, 0}, "Menu");
+    rec_Button restart = rec_Button({200, 75}, Color::Black, {0, 0}, "Restart");
 
     tex.loadFromFile("sprites/GAME_lOSE.png");
     tex.setSmooth(true);
+
     sprit.setTexture(tex);
+    sprit.setPosition(window.getView().getCenter().x - window.getView().getSize().x / 2,
+                      window.getView().getCenter().y - window.getView().getSize().y / 2);
 
-    sprit.setPosition(window.getView().getCenter().x-window.getView().getSize().x/2,window.getView().getCenter().y-window.getView().getSize().y/2);
-    sprit.setScale(window.getSize().x/sprit.getLocalBounds().width,window.getSize().y/sprit.getLocalBounds().height);
+    sprit.setScale(window.getSize().x / sprit.getLocalBounds().width,
+                   window.getSize().y / sprit.getLocalBounds().height);
 
-    Vector2<float> pos = {window.getView().getCenter().x-400,window.getView().getCenter().y+250};
-    Vector2<float> pos2 = {window.getView().getCenter().x+257,window.getView().getCenter().y+250};
-
+    Vector2<float> pos = {window.getView().getCenter().x - 400, window.getView().getCenter().y + 250};
+    Vector2<float> pos2 = {window.getView().getCenter().x + 257, window.getView().getCenter().y + 250};
 
 
     menu.rect.setPosition(pos);
     restart.rect.setPosition(pos2);
 
-    if (menu.is_clicked(window)){
+    if (menu.is_clicked(window)) {
         *menu_open = true;
         *sc = 0;
         *sl = 1;
@@ -390,7 +371,7 @@ void UI::game_over_sreen(RenderWindow &window,int* sc ,int* sl, int* hl, int* an
         p->setPosition(s_pos);
     }
 
-    if (restart.is_clicked(window)){
+    if (restart.is_clicked(window)) {
         *sc = 0;
         *sl = 1;
         *hl = 0;
